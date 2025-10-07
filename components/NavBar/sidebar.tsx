@@ -1,0 +1,88 @@
+"use client"
+
+import { cn } from "@/lib/utils"
+import { ChevronLeft, ChevronRight, Home, BookOpen, BarChart3, Settings, User, Bell } from "lucide-react"
+import { useState } from "react"
+
+export function Sidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const toggleSidebar = () => setIsCollapsed((prev) => !prev)
+
+  const navItems = [
+    { icon: Home, label: 'Home', href: '/', color: 'text-purple-400 hover:text-purple-300' },
+    { icon: BookOpen, label: 'Practice', href: '/practice', color: 'text-blue-400 hover:text-blue-300' },
+    { icon: BarChart3, label: 'Analytics', href: '/analytics', color: 'text-green-400 hover:text-green-300' },
+    { icon: Bell, label: 'Notifications', href: '/notifications', color: 'text-purple-400 hover:text-purple-300' },
+    { icon: Settings, label: 'Settings', href: '/settings', color: 'text-blue-400 hover:text-blue-300' },
+  ]
+
+  return (
+    <aside
+      className={cn(
+        "border-r border-gray-800 transition-all duration-300 h-full flex flex-col",
+        isCollapsed ? "w-16" : "w-64"
+      )}
+    >
+      {/* Header */}
+      <div className={cn('flex items-center justify-between p-6', isCollapsed ? 'px-4' : 'px-6')}>
+        {!isCollapsed && (
+          <h2 className="text-lg font-bold text-purple-400">Interview AI</h2>
+        )}
+        <button
+          onClick={toggleSidebar}
+          className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1">
+        <ul className="">
+          {navItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <li key={item.label} className="flex rounded-xl h-12 hover:bg-gray-800">
+                <a
+                  href={item.href}
+                  className={cn(
+                    'flex px-6 items-center rounded-xl transition-colors',
+                    item.color,
+                    isCollapsed ? 'justify-center' : 'gap-3'
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {!isCollapsed && (
+                    <span className="font-medium">{item.label}</span>
+                  )}
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+
+      {/* User Profile */}
+      <div className="p-4 border-t border-gray-800">
+        <div className={cn(
+          'flex items-center gap-4 rounded-xl',
+          isCollapsed ? 'justify-center' : ''
+        )}>
+          <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-400 via-blue-400 to-green-400 flex items-center justify-center">
+            <User className="h-4 w-4 text-black" />
+          </div>
+          {!isCollapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-white text-sm">Sanju Sathiyamoorthy</p>
+              <p className="text-xs text-gray-400">sanju@gmail.com</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </aside>
+  )
+}
