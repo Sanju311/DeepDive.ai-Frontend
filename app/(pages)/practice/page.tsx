@@ -2,7 +2,7 @@
 
 import { ClarificationPhase } from "@/components/Interview/ClarificationPhase"
 import { useInterview } from "@/components/Interview/InterviewProvider"
-import { DiagramPhase } from "@/components/Interview/DiagramPhase"
+import { DiagramPhase } from "@/components/Interview/DiagramDesignPhase/DiagramPhase"
 
 // import { DiagramPhase } from "@/components/Interview/DiagramPhase"
 // import { DeepDivePhase } from "@/components/Interview/DeepDivePhase"

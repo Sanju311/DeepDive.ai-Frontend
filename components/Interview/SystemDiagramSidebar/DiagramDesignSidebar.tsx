@@ -1,1 +1,0 @@
-//left side bar that will contain all diagram design components for the user to drag and drop
