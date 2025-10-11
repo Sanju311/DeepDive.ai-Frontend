@@ -87,7 +87,6 @@ export function DiagramPhase() {
       <div className="flex-1 flex gap-4 overflow-hidden">
         <DiagramControls 
           components={components} 
-          connections={connections} 
           onStartDrag={handleStartDrag}
           onUpdateDrag={handleUpdateDrag}
         />
