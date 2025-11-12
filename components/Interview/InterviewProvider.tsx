@@ -1,6 +1,6 @@
 'use client'
-import { createContext, useContext, useState, useCallback } from "react"
-import Vapi from "@vapi-ai/web"
+import { createContext, useContext, useState, useCallback, useEffect } from "react"
+import useVapi from "@/hooks/use-vapi"
 
 type InterviewPhase = "clarification" | "diagram" | "deep-dive" | "feedback"
 
@@ -8,8 +8,8 @@ type InterviewSession = {
   id: string | null
   phase: InterviewPhase
   problem_display_data: Record<string, any>
-  vapiAgent?: Vapi
   clarificationNotes: string
+  clarificationAssistantId?: string | null
 }
 
 type InterviewContextType = {
@@ -18,8 +18,15 @@ type InterviewContextType = {
   startDeepDive: () => Promise<void>
   finishInterview: () => Promise<void>
   nextPhase: (notes?: string) => void
+  previousPhase: () => void
   getCurrentPhaseNotes: () => string
   setCurrentPhaseNotes: (notes: string) => void
+  diagramSnapshot: { nodes: any[]; edges: any[] } | null
+  setDiagramSnapshot: (snapshot: { nodes: any[]; edges: any[] }) => void
+  toggleCall: (assistantIdOverride?: string) => Promise<void>
+  conversation: { role: string; text: string; timestamp: string; isFinal: boolean }[]
+  isSessionActive: boolean
+  volumeLevel: number
 }
 
 const InterviewContext = createContext<InterviewContextType | undefined>(undefined)
@@ -31,18 +38,18 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
     phase: "clarification",
     clarificationNotes: "",
   })
+  const { toggleCall, conversation, isSessionActive, volumeLevel } = useVapi({ assistantId: undefined })
   
   // Current phase notes (temporary state for active phase)
   const [currentPhaseNotes, setCurrentPhaseNotes] = useState("")
-
-  const vapi_key: string = process.env.NEXT_PUBLIC_VAPI_CLIENT_API_KEY!
+  // Temporary snapshot of diagram until we submit to backend
+  const [diagramSnapshot, setDiagramSnapshot] = useState<{ nodes: any[]; edges: any[] } | null>(null)
 
   const startInterview = useCallback(async () => {
     try {
 
-        console.log("interview started")
-
-      /*const res = await fetch("/api/interview/start-interview", { method: "POST"})
+      console.log("interview started")
+      const res = await fetch("/api/interview/start-interview", { method: "POST"})
       
       if (!res.ok) {
         throw new Error(`API call failed: ${res.status}`)
@@ -54,17 +61,25 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No assistant ID received from backend")
       }
 
-      // Create VAPI instance with the assistant_id
-      const vapiClient = new Vapi(vapi_key);
-      setSession(prev => ({ ...prev, vapiAgent: vapiClient }))
-      vapiClient.start(data.vapi_clarification_assistant)
-      */
+      if (!data.session_id) {
+        throw new Error("No session ID received from backend")
+      }
+      
+      // Store session and assistant id; voice session is managed by phase components via the hook
+      setSession(prev => ({ 
+        ...prev, 
+        id: data.session_id, 
+        clarificationAssistantId: data.vapi_clarification_assistant ?? null
+      }))
 
     } catch (error) {
       console.error("Failed to start interview:", error)
     }
-  }, [vapi_key])
+  }, [])
 
+  useEffect(() => {
+    console.log("session", session);
+  }, [session]);
 
   async function startDeepDive() {
   }
@@ -75,9 +90,9 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
 
   function nextPhase(notes?: string) {
     if (session.phase === "clarification") {
-      // Stop VAPI call
-      if (session.vapiAgent) {
-        session.vapiAgent.stop()
+      // end vapi clarification call
+      if (isSessionActive) {
+        toggleCall()
       }
       
       // Save current phase notes to session
@@ -86,15 +101,87 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
         ...prev, 
         clarificationNotes: notesToSave,
         phase: "diagram", 
-        vapiAgent: undefined
       }))
       
       // Clear current phase notes
       setCurrentPhaseNotes("")
       
       console.log("Moving from clarification to diagram")
-    }
+    } else if (session.phase === "diagram") {
+      // Export diagram and submit to API, then advance to deep-dive
+      (async () => {
+        try {
+          if (!diagramSnapshot) {
+            console.warn("No diagram snapshot set; cannot finish diagram phase.")
+            return
+          }
+
+          // Normalize nodes
+          const exportedNodes = (diagramSnapshot.nodes || []).map((n: any) => ({
+            id: n.id,
+            type: n.data?.type || n.type || "component",
+            label: n.data?.label ?? "",
+            description: n.data?.description ?? "",
+            position: n.position,
+            values: n.data?.values ?? {},
+            icon: n.data?.icon,
+            category: n.data?.category,
+          }))
+
+          // Normalize edges
+          const exportedEdges = (diagramSnapshot.edges || []).map((e: any) => ({
+            id: e.id,
+            source: e.source,
+            target: e.target,
+            type: e.data?.type || e.type || "custom",
+            label: e.data?.label ?? "",
+            description: e.data?.description ?? "",
+            values: e.data?.values ?? {},
+          }))
+
+          const payload = {
+            session_id: session.id,
+            phase: "diagram",
+            diagram: {
+              nodes: exportedNodes,
+              edges: exportedEdges,
+            },
+          }
+
+          const res = await fetch("/api/interview/finish-diagram-phase", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+
+          if (!res.ok) {
+            console.error("Failed to finish diagram phase:", res.status, await res.text())
+            return
+          }
+
+          // Advance to next phase
+          setSession(prev => ({ ...prev, phase: "deep-dive" }))
+          console.log("Diagram phase submitted; moving to deep-dive")
+        } catch (err) {
+          console.error("Error finishing diagram phase:", err)
+        }
+      })()
+  } else if (session.phase === "deep-dive") {
+   // transition into feedback phase
+   setSession(prev => ({ ...prev, phase: "feedback" }))
+   console.log("Transitioning to feedback phase")
+  } else {
+    console.error("Invalid phase:", session.phase)
   }
+}
+
+function previousPhase() {
+  if (session.phase === "deep-dive") {
+    setSession(prev => ({ ...prev, phase: "diagram" }))
+  } else if (session.phase === "diagram") {
+    setSession(prev => ({ ...prev, phase: "clarification" }))
+  }
+}
 
   function getCurrentPhaseNotes() {
     return currentPhaseNotes
@@ -102,7 +189,7 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <InterviewContext.Provider
-      value={{ session, startInterview, startDeepDive, finishInterview, nextPhase, getCurrentPhaseNotes, setCurrentPhaseNotes }}
+      value={{ session, startInterview, startDeepDive, finishInterview, nextPhase, previousPhase, getCurrentPhaseNotes, setCurrentPhaseNotes, diagramSnapshot, setDiagramSnapshot, toggleCall, conversation, isSessionActive, volumeLevel }}
     >
       {children}
     </InterviewContext.Provider>

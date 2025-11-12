@@ -112,3 +112,11 @@
     --chart-5: 340 75% 55%
   }
 }
+/* Subtle dark scrollbars for scrollable panes */
+.dark-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent; /* thumb track (Firefox) */
+}
+
+
+

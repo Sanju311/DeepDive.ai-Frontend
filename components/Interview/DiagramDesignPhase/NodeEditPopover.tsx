@@ -4,17 +4,20 @@ import { useEffect, useRef, useState } from "react"
 import { Popover, PopoverContent } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import type { Node, Edge } from "./DiagramPhase"
+import { Node} from "./types"
 
 export function NodeEditPopover({
   node,
   onClose,
   onSave,
+  onDelete,
 }: {
   node: Node | null
   onClose: () => void
   onSave: (n: Node) => void
+  onDelete?: (id: string) => void
 }) {
   const [form, setForm] = useState<Node | null>(node)
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null)
@@ -84,8 +87,20 @@ export function NodeEditPopover({
     setForm(prev => (prev ? { ...prev, data: { ...prev.data, [field]: value } } : prev))
   }
 
+  const handleValueChange = (key: string, value: any) => {
+    setForm(prev => (
+      prev ? { ...prev, data: { ...prev.data, values: { ...(prev.data.values || {}), [key]: value } } } : prev
+    ))
+  }
+
   const handleClose = () => {
     if (form) onSave(form)
+    onClose()
+  }
+
+  const deleteNode = () => {
+    if (!form?.id) return
+    onDelete?.(form.id)
     onClose()
   }
 
@@ -112,41 +127,113 @@ export function NodeEditPopover({
         }}
       >
         <div>
-          <Label className="text-xs text-muted-foreground">Label</Label>
+          <Label className="text-xs text-muted-foreground">Optional Display Label</Label>
           <Input
             className="h-7 text-sm"
             value={form.data.label}
             onChange={(e) => handleChange("label", e.target.value)}
+            placeholder="ex: Hashing Service"
             autoFocus
+            maxLength={15}
           />
-        </div>
-
-        <div>
-          <Label className="text-xs text-muted-foreground">Scaling</Label>
-          <Select
-            value={form.data.scaling}
-            onValueChange={(v) => handleChange("scaling", v as Node["data"]["scaling"])}
-          >
-            <SelectTrigger className="h-7 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              <SelectItem value="horizontal">Horizontal</SelectItem>
-              <SelectItem value="vertical">Vertical</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div>
           <Label className="text-xs text-muted-foreground">Description</Label>
-          <Input
-            className="h-7 text-sm"
-            value={form.data.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            placeholder="Optional notes..."
-          />
+          <textarea
+                className="w-full text-sm rounded-md border bg-background pl-2 pr-1 py-2 resize-y max-h-64 min-h-[4rem] overflow-y-auto dark-scroll"
+                value={form?.data?.description ?? ""}
+                onChange={(e) => handleChange("description", e.target.value)}
+                rows={3}
+                placeholder="Briefly describe the node..."
+              />
         </div>
+
+        {/* Dynamic fields based on schema */}
+        {form.data.schema && (
+          <div className="space-y-3">
+            {Object.entries(form.data.schema).map(([key, def]: any) => {
+              const value = form.data.values?.[key]
+              const label = key.charAt(0).toUpperCase() + key.slice(1)
+
+              // Array -> select of options
+              if (Array.isArray(def)) {
+                return (
+                  <div key={key}>
+                    <Label className="text-xs text-muted-foreground">{label}</Label>
+                    <Select value={value} onValueChange={(v) => handleValueChange(key, v)}>
+                      <SelectTrigger className="h-7 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {def.map((opt: string) => (
+                          <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )
+              }
+
+              // Primitive type -> input/select
+              if (def === "number") {
+                return (
+                  <div key={key}>
+                    <Label className="text-xs text-muted-foreground">{label}</Label>
+                    <Input
+                      type="number"
+                      className="h-7 text-sm"
+                      value={value ?? 0}
+                      onChange={(e) => handleValueChange(key, Number(e.target.value))}
+                    />
+                  </div>
+                )
+              }
+
+              if (def === "boolean") {
+                return (
+                  <div key={key}>
+                    <Label className="text-xs text-muted-foreground">{label}</Label>
+                    <Select value={String(value)} onValueChange={(v) => handleValueChange(key, v === "true") }>
+                      <SelectTrigger className="h-7 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">True</SelectItem>
+                        <SelectItem value="false">False</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )
+              }
+
+              // default string input (use textarea for 'description' style keys)
+              return (
+                <div key={key}>
+                  <Label className="text-xs text-muted-foreground">{label}</Label>
+                  {key.toLowerCase() === "description" ? (
+                      <textarea
+                      className="w-full text-sm rounded-md border bg-background pl-2 pr-1 py-2 resize-y max-h-64 min-h-[4rem] overflow-y-auto dark-scroll"
+                      value={form?.data?.description ?? ""}
+                      onChange={(e) => handleChange("description", e.target.value)}
+                      rows={3}
+                      placeholder="Briefly describe the connection..."
+                    />
+                  ) : (
+                    <Input
+                      className="h-7 text-sm"
+                      value={value ?? ""}
+                      onChange={(e) => handleValueChange(key, e.target.value)}
+                    />
+                  )}
+                </div>
+              )
+            })}
+            <Button onClick={deleteNode} variant="outline" className="mt-2 p-2 block ml-auto justify-end">Delete</Button>
+          </div>
+        )}
+
+        
       </PopoverContent>
       )}
     </Popover>
