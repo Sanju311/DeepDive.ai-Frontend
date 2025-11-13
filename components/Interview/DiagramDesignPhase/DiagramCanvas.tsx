@@ -363,6 +363,7 @@ export function DiagramCanvas({
         zoomOnScroll={!readOnly}
         zoomOnPinch={!readOnly}
         zoomOnDoubleClick={!readOnly}
+        proOptions={{ hideAttribution: true }}
       >
         <Background />
       </ReactFlow>

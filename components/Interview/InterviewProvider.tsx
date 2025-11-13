@@ -10,15 +10,16 @@ type InterviewSession = {
   problem_display_data: Record<string, any>
   clarificationNotes: string
   clarificationAssistantId?: string | null
+  deepdiveAssistantID?: string | null
 }
 
 type InterviewContextType = {
   session: InterviewSession
   startInterview: () => Promise<void>
-  startDeepDive: () => Promise<void>
   finishInterview: () => Promise<void>
   nextPhase: (notes?: string) => void
   previousPhase: () => void
+  navDirection: "forward" | "backward" | null
   getCurrentPhaseNotes: () => string
   setCurrentPhaseNotes: (notes: string) => void
   diagramSnapshot: { nodes: any[]; edges: any[] } | null
@@ -44,6 +45,8 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
   const [currentPhaseNotes, setCurrentPhaseNotes] = useState("")
   // Temporary snapshot of diagram until we submit to backend
   const [diagramSnapshot, setDiagramSnapshot] = useState<{ nodes: any[]; edges: any[] } | null>(null)
+  // Track navigation direction to control auto-start behavior of calls on mount
+  const [navDirection, setNavDirection] = useState<"forward" | "backward" | null>(null)
 
   const startInterview = useCallback(async () => {
     try {
@@ -57,7 +60,7 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
       
       const data = await res.json()
       
-      if (!data.vapi_clarification_assistant) {
+      if (!data.vapi_clarification_assistant_id) {
         throw new Error("No assistant ID received from backend")
       }
 
@@ -89,10 +92,12 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
   }
 
   function nextPhase(notes?: string) {
+    setNavDirection("forward")
     if (session.phase === "clarification") {
       // end vapi clarification call
       if (isSessionActive) {
         toggleCall()
+        console.log("Vapi clarification call ended")
       }
       
       // Save current phase notes to session
@@ -159,8 +164,23 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
             return
           }
 
-          // Advance to next phase
-          setSession(prev => ({ ...prev, phase: "deep-dive" }))
+          const data = await res.json()
+
+          if (!data.vapi_deepdive_assistant_id) {
+            throw new Error("No assistant ID received from backend")
+          }
+
+          if (!data.session_id) {
+            throw new Error("No session ID received from backend")
+          }
+
+          // Store session and assistant id; voice session is managed by phase components via the hook
+          setSession(prev => ({ 
+            ...prev, 
+            id: data.session_id, 
+            phase: "deep-dive",
+            deepdiveAssistantID: data.vapi_deepdive_assistant_id ?? null
+          }))
           console.log("Diagram phase submitted; moving to deep-dive")
         } catch (err) {
           console.error("Error finishing diagram phase:", err)
@@ -176,6 +196,12 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
 }
 
 function previousPhase() {
+  setNavDirection("backward")
+  // Ensure any active VAPI session is stopped when navigating backward
+  if (isSessionActive) {
+    toggleCall()
+    console.log("Vapi call ended due to navigating to previous phase")
+  }
   if (session.phase === "deep-dive") {
     setSession(prev => ({ ...prev, phase: "diagram" }))
   } else if (session.phase === "diagram") {
@@ -189,7 +215,7 @@ function previousPhase() {
 
   return (
     <InterviewContext.Provider
-      value={{ session, startInterview, startDeepDive, finishInterview, nextPhase, previousPhase, getCurrentPhaseNotes, setCurrentPhaseNotes, diagramSnapshot, setDiagramSnapshot, toggleCall, conversation, isSessionActive, volumeLevel }}
+      value={{ session, startInterview, finishInterview, nextPhase, previousPhase, navDirection, getCurrentPhaseNotes, setCurrentPhaseNotes, diagramSnapshot, setDiagramSnapshot, toggleCall, conversation, isSessionActive, volumeLevel }}
     >
       {children}
     </InterviewContext.Provider>
