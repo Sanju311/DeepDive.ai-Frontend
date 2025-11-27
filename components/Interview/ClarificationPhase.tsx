@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useInterview } from "./InterviewProvider"
 import InterviewShell from "./InterviewShell"
 import TranscriptPanel from "./TranscriptPanel"
@@ -9,17 +9,22 @@ import { InterviewSidebar } from "./InterviewSidebar/InterviewSidebar"
 
 export function ClarificationPhase() {
   const { startInterview, session, toggleCall, isSessionActive, navDirection } = useInterview()
+  const startedRef = useRef(false)
 
   useEffect(() => {
     startInterview()
   }, [startInterview])
 
   useEffect(() => {
-    // Auto-start only when not coming from a backward navigation
-    if (session.clarificationAssistantId && !isSessionActive && navDirection !== "backward") {
-      toggleCall(session.clarificationAssistantId)
+    // Auto-start once when overrides are available and not navigating backward
+    if (navDirection === "backward") return
+    if (startedRef.current) return
+    const overrides = session?.clarificationOverrides
+    if (!isSessionActive && overrides && Object.keys(overrides).length > 0) {
+      startedRef.current = true
+      toggleCall("clarification", overrides)
     }
-  }, [session.clarificationAssistantId, isSessionActive, toggleCall, navDirection])
+  }, [isSessionActive, toggleCall, navDirection, session?.clarificationOverrides])
 
   return (
     <InterviewShell

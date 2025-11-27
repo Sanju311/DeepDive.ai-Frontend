@@ -11,6 +11,7 @@ export function TopPhaseNav() {
     { id: "clarification", label: "Clarification" },
     { id: "diagram", label: "Diagram" },
     { id: "deep-dive", label: "Deep Dive" },
+    { id: "feedback", label: "Feedback" },
   ]
 
   return (

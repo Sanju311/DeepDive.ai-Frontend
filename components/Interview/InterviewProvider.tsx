@@ -9,8 +9,12 @@ type InterviewSession = {
   phase: InterviewPhase
   problem_display_data: Record<string, any>
   clarificationNotes: string
+  deepdiveFeedback?: Record<string, { score: number; feedback: string }> | null
   clarificationAssistantId?: string | null
   deepdiveAssistantID?: string | null
+  clarificationOverrides?: Record<string, any> | null
+  deepdiveOverrides?: Record<string, any> | null
+  deepdiveCategoryOrderList?: string[] | null
 }
 
 type InterviewContextType = {
@@ -24,10 +28,12 @@ type InterviewContextType = {
   setCurrentPhaseNotes: (notes: string) => void
   diagramSnapshot: { nodes: any[]; edges: any[] } | null
   setDiagramSnapshot: (snapshot: { nodes: any[]; edges: any[] }) => void
-  toggleCall: (assistantIdOverride?: string) => Promise<void>
+  toggleCall: (assistantType?: "clarification" | "deep-dive", assistantOverrides?: Record<string, any>) => Promise<void>
   conversation: { role: string; text: string; timestamp: string; isFinal: boolean }[]
   isSessionActive: boolean
   volumeLevel: number
+  configureDeepDive: (sessionId: string | null, categoryOrder: string[]) => void
+  setDeepdiveFeedback: (fb: Record<string, { score: number; feedback: string }>) => void
 }
 
 const InterviewContext = createContext<InterviewContextType | undefined>(undefined)
@@ -38,8 +44,12 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
     problem_display_data: {},
     phase: "clarification",
     clarificationNotes: "",
+    deepdiveFeedback: null,
+    clarificationOverrides: null,
+    deepdiveOverrides: null,
+    deepdiveCategoryOrderList: null,
   })
-  const { toggleCall, conversation, isSessionActive, volumeLevel } = useVapi({ assistantId: undefined })
+  const { toggleCall, conversation, isSessionActive, volumeLevel, configureDeepDive } = useVapi({ assistantId: undefined })
   
   // Current phase notes (temporary state for active phase)
   const [currentPhaseNotes, setCurrentPhaseNotes] = useState("")
@@ -59,20 +69,22 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
       }
       
       const data = await res.json()
-      
-      if (!data.vapi_clarification_assistant_id) {
-        throw new Error("No assistant ID received from backend")
-      }
-
       if (!data.session_id) {
         throw new Error("No session ID received from backend")
       }
       
-      // Store session and assistant id; voice session is managed by phase components via the hook
+      // Store session id and problem info; assistants are persistent and created client-side with overrides
+      const problemInfo = data.problem_info || {}
+      const overrides = problemInfo.vapi_clarification_assistant_overrides || null
+      // Keep problem_info available for UI if needed
+      const problemDisplayData = problemInfo
+
+      // Store session and overrides; voice session is managed by phase components via the hook
       setSession(prev => ({ 
         ...prev, 
         id: data.session_id, 
-        clarificationAssistantId: data.vapi_clarification_assistant ?? null
+        problem_display_data: problemDisplayData,
+        clarificationOverrides: overrides,
       }))
 
     } catch (error) {
@@ -166,20 +178,19 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
 
           const data = await res.json()
 
-          if (!data.vapi_deepdive_assistant_id) {
-            throw new Error("No assistant ID received from backend")
-          }
-
           if (!data.session_id) {
             throw new Error("No session ID received from backend")
           }
 
-          // Store session and assistant id; voice session is managed by phase components via the hook
+          // Store session and deep-dive overrides; deep-dive assistant is persistent and started client-side
+          const deepdiveOverrides = data.deepdive_overrides || null
+          const rubricCategoryOrderList = data.deepdive_category_order_list || []
           setSession(prev => ({ 
             ...prev, 
             id: data.session_id, 
             phase: "deep-dive",
-            deepdiveAssistantID: data.vapi_deepdive_assistant_id ?? null
+            deepdiveOverrides,
+            deepdiveCategoryOrderList: rubricCategoryOrderList,
           }))
           console.log("Diagram phase submitted; moving to deep-dive")
         } catch (err) {
@@ -215,7 +226,24 @@ function previousPhase() {
 
   return (
     <InterviewContext.Provider
-      value={{ session, startInterview, finishInterview, nextPhase, previousPhase, navDirection, getCurrentPhaseNotes, setCurrentPhaseNotes, diagramSnapshot, setDiagramSnapshot, toggleCall, conversation, isSessionActive, volumeLevel }}
+      value={{ 
+        session, 
+        startInterview, 
+        finishInterview, 
+        nextPhase, 
+        previousPhase, 
+        navDirection, 
+        getCurrentPhaseNotes, 
+        setCurrentPhaseNotes,
+        diagramSnapshot, 
+        setDiagramSnapshot, 
+        toggleCall, 
+        conversation, 
+        isSessionActive, 
+        volumeLevel, 
+        configureDeepDive,
+        setDeepdiveFeedback: (fb) => setSession(prev => ({ ...prev, deepdiveFeedback: fb })),
+      }}
     >
       {children}
     </InterviewContext.Provider>

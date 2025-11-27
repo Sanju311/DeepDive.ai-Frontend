@@ -126,7 +126,7 @@ export function NodeEditPopover({
           top: coords?.top ?? 0,
         }}
       >
-        <div>
+        <div className="flex flex-col gap-1">
           <Label className="text-xs text-muted-foreground">Optional Display Label</Label>
           <Input
             className="h-7 text-sm"
@@ -138,7 +138,7 @@ export function NodeEditPopover({
           />
         </div>
 
-        <div>
+        <div className="flex flex-col gap-1">
           <Label className="text-xs text-muted-foreground">Description</Label>
           <textarea
                 className="w-full text-sm rounded-md border bg-background pl-2 pr-1 py-2 resize-y max-h-64 min-h-[4rem] overflow-y-auto dark-scroll"
@@ -159,7 +159,7 @@ export function NodeEditPopover({
               // Array -> select of options
               if (Array.isArray(def)) {
                 return (
-                  <div key={key}>
+                  <div key={key} className="flex flex-col gap-1">
                     <Label className="text-xs text-muted-foreground">{label}</Label>
                     <Select value={value} onValueChange={(v) => handleValueChange(key, v)}>
                       <SelectTrigger className="h-7 text-sm">
@@ -178,7 +178,7 @@ export function NodeEditPopover({
               // Primitive type -> input/select
               if (def === "number") {
                 return (
-                  <div key={key}>
+                  <div key={key} className="flex flex-col gap-1">
                     <Label className="text-xs text-muted-foreground">{label}</Label>
                     <Input
                       type="number"
@@ -192,7 +192,7 @@ export function NodeEditPopover({
 
               if (def === "boolean") {
                 return (
-                  <div key={key}>
+                  <div key={key} className="flex flex-col gap-1">
                     <Label className="text-xs text-muted-foreground">{label}</Label>
                     <Select value={String(value)} onValueChange={(v) => handleValueChange(key, v === "true") }>
                       <SelectTrigger className="h-7 text-sm">
@@ -209,7 +209,7 @@ export function NodeEditPopover({
 
               // default string input (use textarea for 'description' style keys)
               return (
-                <div key={key}>
+                <div key={key} className="flex flex-col gap-1">
                   <Label className="text-xs text-muted-foreground">{label}</Label>
                   {key.toLowerCase() === "description" ? (
                       <textarea
