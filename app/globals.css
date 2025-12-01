@@ -8,6 +8,8 @@
   }
   body {
     @apply bg-black text-white;
+    overflow-y: scroll; /* keep scrollbar space reserved to prevent layout shift */
+    scrollbar-gutter: stable both-edges;
   }
   :root {
 
@@ -111,6 +113,18 @@
 
     --chart-5: 340 75% 55%
   }
+  .theme {
+
+    --animate-first: moveVertical 30s ease infinite;
+
+    --animate-second: moveInCircle 20s reverse infinite;
+
+    --animate-third: moveInCircle 40s linear infinite;
+
+    --animate-fourth: moveHorizontal 40s ease infinite;
+
+    --animate-fifth: moveInCircle 20s ease infinite
+  }
 }
 /* Subtle dark scrollbars for scrollable panes */
 .dark-scroll {
@@ -118,5 +132,125 @@
   scrollbar-color: #3f3f46 transparent; /* thumb track (Firefox) */
 }
 
+/* Glowing, animated background orbs */
+.orb {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  /* stronger luminescent glow */
+  filter: blur(220px) saturate(1.3) brightness(1.1) drop-shadow(0 0 120px rgba(255,255,255,0.06));
+  opacity: 0.68;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+.orb1 {
+  background: radial-gradient(circle at 40% 50%, rgba(107,91,255,0.95) 0%, rgba(107,91,255,0.6) 45%, rgba(107,91,255,0) 70%);
+  top: 10%; left: 15%;
+  animation: float1 4s linear infinite alternate;
+}
+.orb2 {
+  background: radial-gradient(circle at 60% 45%, rgba(255,79,168,0.92) 0%, rgba(255,79,168,0.58) 45%, rgba(255,79,168,0) 70%);
+  top: 20%; left: 30%;
+  animation: float2 5s linear infinite alternate;
+  width: 520px; height: 520px;
+}
+.orb3 {
+  background: radial-gradient(circle at 45% 55%, rgba(59,211,255,0.92) 0%, rgba(59,211,255,0.58) 45%, rgba(59,211,255,0) 70%);
+  top: 30%; left: 35%;
+  animation: float3 4.5s linear infinite alternate;
+}
+.orb4 {
+  background: radial-gradient(circle at 50% 50%, rgba(51,255,168,0.9) 0%, rgba(51,255,168,0.52) 45%, rgba(51,255,168,0) 70%);
+  top: 40%; left: 60%;
+  animation: float4 6s linear infinite alternate;
+  width: 600px; height: 600px;
+}
+.orb5 {
+  background: radial-gradient(circle at 55% 60%, rgba(168,85,247,0.94) 0%, rgba(168,85,247,0.58) 45%, rgba(168,85,247,0) 70%);
+  top: 45%; left: 15%;
+  animation: float5 5.5s linear infinite alternate;
+}
 
+@keyframes float1 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(180px, -120px, 0) scale(1.15); }
+}
+@keyframes float2 {
+  0%   { transform: translate3d(0, 0, 0) scale(1.1); }
+  100% { transform: translate3d(-160px, 100px, 0) scale(0.95); }
+}
+@keyframes float3 {
+  0%   { transform: translate3d(0, 0, 0) scale(0.95); }
+  100% { transform: translate3d(120px, 160px, 0) scale(1.1); }
+}
+@keyframes float4 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-140px, -160px, 0) scale(1.2); }
+}
+@keyframes float5 {
+  0%   { transform: translate3d(0, 0, 0) scale(1.05); }
+  100% { transform: translate3d(-80px, 120px, 0) scale(1.1); }
+}
 
+/* Override Tailwind's reduce-motion preflight for orbs when explicitly allowed */
+@media (prefers-reduced-motion: reduce) {
+  [data-allow-motion="true"] .orb1 { animation: float1 16s ease-in-out infinite alternate !important; }
+  [data-allow-motion="true"] .orb2 { animation: float2 22s ease-in-out infinite alternate !important; }
+  [data-allow-motion="true"] .orb3 { animation: float3 20s ease-in-out infinite alternate !important; }
+  [data-allow-motion="true"] .orb4 { animation: float4 26s ease-in-out infinite alternate !important; }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overflow-y: scroll; /* keep scrollbar space reserved to prevent layout shift */
+    scrollbar-gutter: stable both-edges;
+  }
+}
+
+/* one-off icon spin */
+@keyframes spin360 {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@theme inline {
+  @keyframes moveHorizontal {
+  0% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  50% {
+    transform: translateX(50%) translateY(10%);
+    }
+  100% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  }
+  @keyframes moveInCircle {
+  0% {
+    transform: rotate(0deg);
+    }
+  50% {
+    transform: rotate(180deg);
+    }
+  100% {
+    transform: rotate(360deg);
+    }
+  }
+  @keyframes moveVertical {
+  0% {
+    transform: translateY(-50%);
+    }
+  50% {
+    transform: translateY(50%);
+    }
+  100% {
+    transform: translateY(-50%);
+    }
+  }
+}

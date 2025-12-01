@@ -71,7 +71,7 @@ export type NodeCategory = 'client' | 'server' | 'data' | 'network' | 'messaging
       category: 'network',
       options: {
         rateLimiting: ["Yes", "No"],
-        scaling: ["none", "horizontal"],
+        scaling: ["None", "Horizontal"],
       },
     },
     {
@@ -96,7 +96,7 @@ export type NodeCategory = 'client' | 'server' | 'data' | 'network' | 'messaging
       icon: "🧠",
       category: 'server',
       options: {
-        scaling: ["none", "horizontal", "vertical"],
+        scaling: ["None", "Horizontal", "Vertical"],
       },
     },
     {
@@ -170,8 +170,8 @@ export type NodeCategory = 'client' | 'server' | 'data' | 'network' | 'messaging
       id: "http",
       name: "HTTP",
       icon: "➡️",
-      allowedSourceCategories: ['client','server'],
-      allowedTargetCategories: ['server'],
+      allowedSourceCategories: ['client','server', 'network'],
+      allowedTargetCategories: ['server', 'network'],
       schema: {
       },
     },

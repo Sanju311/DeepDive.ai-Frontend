@@ -94,8 +94,8 @@ export function DiagramCanvas({
         className="relative rounded-md text-center shadow-sm select-none"
       >
         <div
-          className="absolute rounded-md border border-border bg-card p-2 z-10 flex flex-col items-center justify-center gap-1"
-          style={{ top: '5%', left: '5%', right: '5%', bottom: '5%' }}
+          className="absolute rounded-md border border-border bg-card p-0 overflow-hidden z-10 flex flex-col items-center justify-center gap-1"
+          style={{ inset: 0 }}
         >
           <span className="text-xl">{data.icon}</span>
 

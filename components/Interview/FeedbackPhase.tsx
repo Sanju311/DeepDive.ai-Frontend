@@ -13,6 +13,12 @@ type FeedbackResponse = {
 }
 
 type CategoryFeedback = { score: number; feedback: string }
+type CommunicationFeedback = {
+  communication_score: number
+  communication_feedback: string
+  overall_pros?: string[]
+  overall_cons?: string[]
+}
 
 function scoreColor(score: number) {
   if (score <= 1) return "#ef4444"      // red
@@ -61,9 +67,10 @@ function RadialGauge({ score, size = 96, strokeWidth = 10 }: { score: number; si
 }
 
 function FeedbackContent() {
-  const { session, setDeepdiveFeedback } = useInterview()
+  const {session, setDeepdiveFeedback } = useInterview()
   const [isLoading, setIsLoading] = useState(true)
   const [message, setMessage] = useState("We’re evaluating your session. This may take a little while...")
+  const [communication, setCommunication] = useState<CommunicationFeedback | null>(null)
   const stopRef = useRef(false)
 
   useEffect(() => {
@@ -79,11 +86,10 @@ function FeedbackContent() {
         })
         if (res.ok) {
           const data: FeedbackResponse = await res.json()
-          if (data?.success) {
+          if (data?.success) { 
             console.log("Feedback:", data?.feedback)
-            if (data?.feedback) {
-              setDeepdiveFeedback(data.feedback)
-            }
+            if ((data as any)?.category_scores) setDeepdiveFeedback((data as any).category_scores)
+            if ((data as any)?.communication) setCommunication((data as any).communication)
             setIsLoading(false)
             setMessage("Feedback is ready.")
             stopRef.current = true
@@ -103,61 +109,114 @@ function FeedbackContent() {
   }, [session.id])
 
   const feedback: Record<string, CategoryFeedback> | null = session.deepdiveFeedback || null
-  const keys = feedback ? Object.keys(feedback) : []
+  const cats = (feedback || {}) as Record<string, CategoryFeedback>
+  // Order categories by rubric order from session; unknowns follow
+  const rubricOrder = (session.deepdiveCategoryOrderList || []).map((s) => String(s).toLowerCase())
+  const keys = Object.keys(cats).sort((a, b) => {
+    const ia = rubricOrder.indexOf(String(a).toLowerCase())
+    const ib = rubricOrder.indexOf(String(b).toLowerCase())
+    const sa = ia === -1 ? Number.MAX_SAFE_INTEGER : ia
+    const sb = ib === -1 ? Number.MAX_SAFE_INTEGER : ib
+    if (sa !== sb) return sa - sb
+    return a.localeCompare(b)
+  })
 
-  if (isLoading || !feedback || keys.length === 0) {
+  if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center p-8">
         <div className="flex items-center gap-3 text-gray-300">
           <Loader2 className="h-5 w-5 animate-spin" />
           <span className="text-sm">{message}</span>
         </div>
-      </div>
+      </div> 
     )
   }
 
   return (
-    <div className="w-full h-full overflow-auto p-8">
-      <div className="w-[90%] max-w-6xl mx-auto space-y-5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {keys.map((key) => {
-            const cf = feedback[key]
-            const title = key.charAt(0).toUpperCase() + key.slice(1)
-            return (
-              <Card key={key} className="border-zinc-800 bg-zinc-950 p-">
-                <CardHeader className="pt-6 pb-0 px-6">
-                  <CardTitle className="text-lg md:text-xl text-white">{title}</CardTitle>
-                </CardHeader>
-                <CardContent className="px-6 pb-6 pt-4 flex flex-col gap-6">
-                  <div className="w-full flex justify-center py-2">
-                    <RadialGauge score={cf?.score ?? 0} size={192} strokeWidth={16} />
-                  </div>
-                  <div className="text-base leading-7 text-gray-300 text-left">
-                    {cf?.feedback || "No feedback provided."}
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+    <div className="w-full h-full overflow-auto p-4">
+      <div className="w-[96%] mx-auto space-y-5">
+        {(() => {
+          const totalCards = (communication ? 1 : 0) + keys.length
+          const gaugeSize = totalCards >= 4 ? 160 : totalCards === 3 ? 180 : 200
+          const stroke = totalCards >= 4 ? 12 : 14
+          const cardMinHeight = totalCards >= 4 ? 420 : 480
+          return (
+            <div
+              className="gap-4"
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${Math.max(totalCards, 1)}, minmax(220px, 1fr))`,
+                alignItems: "stretch",
+              }}
+            >
+              
+              {/* Category cards in rubric order */}
+              {keys.map((key) => {
+                const cf = cats[key]
+                const title = key.charAt(0).toUpperCase() + key.slice(1)
+                return (
+                  <Card key={key} className="border-zinc-800 bg-zinc-950 h-full flex flex-col" style={{ minHeight: cardMinHeight }}>
+                    <CardHeader className="pt-4 pb-0 px-4">
+                      <CardTitle className="text-base md:text-lg text-white">{title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-4">
+                      <div className="w-full flex justify-center py-1">
+                        <RadialGauge score={cf?.score ?? 0} size={gaugeSize} strokeWidth={stroke} />
+                      </div>
+                      <div className="text-sm md:text-[0.9rem] leading-6 text-gray-300 text-left">
+                        {cf?.feedback || "No feedback provided."}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+              {/* Communication card */}
+              {communication && (
+                <Card className="border-zinc-800 bg-zinc-950 h-full flex flex-col" style={{ minHeight: cardMinHeight }}>
+                  <CardHeader className="pt-4 pb-0 px-4">
+                    <CardTitle className="text-base md:text-lg text-white">Communication</CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-4">
+                    <div className="w-full flex justify-center py-1">
+                      <RadialGauge score={Number(communication.communication_score ?? 0)} size={gaugeSize} strokeWidth={stroke} />
+                    </div>
+                    <div className="text-sm md:text-[0.95rem] leading-6 text-gray-300 text-left">
+                      {communication.communication_feedback || "No feedback provided."}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )
+        })()}
 
         <Card className="border-zinc-800 bg-zinc-950">
-          <CardHeader className="pt-6 pb-0 px-6">
-            <CardTitle className="text-lg md:text-xl text-white">Overall Pros & Cons</CardTitle>
-          </CardHeader>
+
           <CardContent className="px-6 pb-6 pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <div className="text-base font-semibold text-green-400 mb-3">Pros</div>
-                <ul className="list-disc list-inside text-base leading-7 text-gray-300">
-                  <li>Coming soon</li>
-                </ul>
+                <div className="text-lg font-semibold text-green-400 mb-3">Pros</div>
+                {Array.isArray(communication?.overall_pros) && communication!.overall_pros!.length > 0 ? (
+                  <ul className="list-disc list-outside pl-6 text-sm md:text-base leading-7 text-gray-300">
+                    {communication!.overall_pros!.map((p: string, idx: number) => (
+                      <li key={idx}>{p}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-base leading-7 text-gray-500">No pros provided.</div>
+                )}
               </div>
               <div>
-                <div className="text-base font-semibold text-red-400 mb-3">Cons</div>
-                <ul className="list-disc list-inside text-base leading-7 text-gray-300">
-                  <li>Coming soon</li>
-                </ul>
+                <div className="text-lg font-semibold text-red-400 mb-3">Cons</div>
+                {Array.isArray(communication?.overall_cons) && communication!.overall_cons!.length > 0 ? (
+                  <ul className="list-disc list-outside pl-6 text-sm md:text-base leading-7 text-gray-300">
+                    {communication!.overall_cons!.map((c: string, idx: number) => (
+                      <li key={idx}>{c}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-base leading-7 text-gray-500">No cons provided.</div>
+                )}
               </div>
             </div>
           </CardContent>

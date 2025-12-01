@@ -77,7 +77,7 @@ export function InterviewProvider({ children }: { children: React.ReactNode }) {
       const problemInfo = data.problem_info || {}
       const overrides = problemInfo.vapi_clarification_assistant_overrides || null
       // Keep problem_info available for UI if needed
-      const problemDisplayData = problemInfo
+      const problemDisplayData = problemInfo.display_info
 
       // Store session and overrides; voice session is managed by phase components via the hook
       setSession(prev => ({ 

@@ -31,6 +31,8 @@ export function ClarificationPhase() {
       left={<TranscriptPanel />}
       middle={<NotesPanel />}
       right={<InterviewSidebar />}
+      leftWidth="minmax(0,1fr)"
+      rightWidth="50%"
     />
   )
 }
