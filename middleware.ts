@@ -6,6 +6,11 @@ export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
   const pathname = nextUrl.pathname;
 
+  // Bypass middleware for static assets and files (served from /public)
+  if (/\.(?:png|jpg|jpeg|gif|webp|svg|ico|css|js|map|txt|json|xml|woff2?|ttf|otf|eot)$/i.test(pathname)) {
+    return NextResponse.next();
+  }
+
   // Let Auth0 handle its own routes
   if (pathname.startsWith("/auth/")) {
     return await auth0.middleware(request);
@@ -40,6 +45,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    // Also exclude common static file extensions served from /public
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|css|js|map|txt|json|xml|woff|woff2|ttf|otf|eot)).*)",
   ],
 };

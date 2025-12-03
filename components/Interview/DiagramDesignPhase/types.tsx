@@ -179,8 +179,8 @@ export type NodeCategory = 'client' | 'server' | 'data' | 'network' | 'messaging
       id: "websocket",
       name: "WebSocket",
       icon: "🔁",
-      allowedSourceCategories: ['client','server'],
-      allowedTargetCategories: ['server'],
+      allowedSourceCategories: ['client','server', 'network'],
+      allowedTargetCategories: ['server', 'network'],
       schema: {
       },
     },

@@ -91,7 +91,7 @@ export function DiagramCanvas({
           width: `${NODE_WIDTH}px`,
           height: `${NODE_HEIGHT}px`
         }}
-        className="relative rounded-md text-center shadow-sm select-none"
+        className="relative rounded-md text-center shadow-sm select-none bg-background"
       >
         <div
           className="absolute rounded-md border border-border bg-card p-0 overflow-hidden z-10 flex flex-col items-center justify-center gap-1"

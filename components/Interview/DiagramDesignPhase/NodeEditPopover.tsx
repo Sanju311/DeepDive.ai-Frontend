@@ -213,7 +213,7 @@ export function NodeEditPopover({
                   <Label className="text-xs text-muted-foreground">{label}</Label>
                   {key.toLowerCase() === "description" ? (
                       <textarea
-                      className="w-full text-sm rounded-md border bg-background pl-2 pr-1 py-2 resize-y max-h-64 min-h-[4rem] overflow-y-auto dark-scroll"
+                      className="w-full text-sm rounded-md border bg-background pl-2 pr-1 py-2 resize-y max-h-64 min-h-[4rem] overflow-y-auto dark-scroll focus:outline-none focus-visible:outline-none focus:ring-0 focus:border-border"
                       value={form?.data?.description ?? ""}
                       onChange={(e) => handleChange("description", e.target.value)}
                       rows={3}

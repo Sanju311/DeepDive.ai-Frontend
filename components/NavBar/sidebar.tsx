@@ -24,8 +24,7 @@ export function Sidebar() {
   }
 
   const navItems = [
-    { icon: Home, label: 'Home', href: '/home', color: 'text-purple-400 hover:text-purple-300' },
-    { icon: BookOpen, label: 'Practice', href: '/practice', color: 'text-blue-400 hover:text-blue-300' },
+    { icon: BookOpen, label: 'Problems', href: '/home', color: 'text-blue-400 hover:text-blue-300' },
     { icon: BarChart3, label: 'Analytics', href: '/analytics', color: 'text-green-400 hover:text-green-300' },
     { icon: Bell, label: 'Notifications', href: '/notifications', color: 'text-purple-400 hover:text-purple-300' },
   ]
@@ -33,7 +32,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "border-r border-gray-800 transition-all duration-300 h-full flex flex-col bg-gray-900",
+        "border-r transition-all duration-300 h-full flex flex-col",
         isCollapsed ? "w-16" : "w-64"
       )}
       onTransitionEnd={handleTransitionEnd}
@@ -45,7 +44,7 @@ export function Sidebar() {
         )}
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+          className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -61,7 +60,7 @@ export function Sidebar() {
           {navItems.map((item) => {
             const Icon = item.icon
             return (
-              <li key={item.label} className="flex rounded-xl h-12 hover:bg-gray-800">
+              <li key={item.label} className="flex rounded-xl h-12 hover:bg-muted">
                 <a
                   href={item.href}
                   className={cn(
@@ -82,7 +81,7 @@ export function Sidebar() {
       </nav>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-border">
         <div className={cn(
           'flex items-center gap-4 rounded-xl',
           isCollapsed ? 'justify-center' : ''
@@ -92,8 +91,8 @@ export function Sidebar() {
           </div>
           {!isCollapsed && expandedReady && (
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-white text-sm whitespace-nowrap">Sanju Sathiyamoorthy</p>
-              <p className="text-xs text-gray-400 whitespace-nowrap">sanju@gmail.com</p>
+              <p className="font-medium text-foreground text-sm whitespace-nowrap">Sanju Sathiyamoorthy</p>
+              <p className="text-xs text-muted-foreground whitespace-nowrap">sanjumoorthy622@gmail.com</p>
             </div>
           )}
         </div>

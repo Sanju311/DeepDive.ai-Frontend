@@ -24,7 +24,7 @@ export default function TranscriptPanel() {
 
       {/* Transcript list (scrollable) */}
       <div
-        className="flex-1 min-h-0 rounded-lg  p-3 bg-black/30 overflow-y-auto dark-scroll"
+        className="flex-1 min-h-0 rounded-lg p-4 overflow-y-auto dark-scroll"
         ref={transcriptRef}
       >
         {conversation.map((m: { role: string; text: string; timestamp: string; isFinal: boolean; committedChars?: number }, idx: number) => {

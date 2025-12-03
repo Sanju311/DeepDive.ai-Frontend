@@ -36,7 +36,7 @@ export default function InterviewShell({ left, middle, right, leftWidth = "22rem
   const meta = PHASE_META[session.phase] ?? PHASE_META.clarification
 
   return (
-    <div className="flex h-screen bg-gray-950 text-white p-6 gap-4">
+    <div className="flex h-screen bg-background text-foreground p-6 gap-4">
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Header */}
         <div className="flex items-start justify-between p-2 ">
@@ -49,15 +49,25 @@ export default function InterviewShell({ left, middle, right, leftWidth = "22rem
           </div>
         </div>
 
-        {/* Body: 3 columns */}
-        <div
-          className="flex-1 mt-6 overflow-hidden min-h-0 grid gap-4"
-          style={{ gridTemplateColumns: `${leftWidth} minmax(0,1fr) ${rightWidth}` }}
-        >
-          <div className="min-h-0 overflow-hidden rounded-lg border border-zinc-800 p-4">{left}</div>
-          <div className="min-h-0 overflow-hidden rounded-lg border border-zinc-800 p-0 flex flex-col">{middle}</div>
-          <div className="min-h-0 overflow-hidden rounded-lg border border-zinc-800">{right}</div>
-        </div>
+        {/* Body: 2 or 3 columns */}
+        {right ? (
+          <div
+            className="flex-1 mt-6 overflow-hidden min-h-0 grid gap-4"
+            style={{ gridTemplateColumns: `${leftWidth} minmax(0,1fr) ${rightWidth}` }}
+          >
+            <div className="min-h-0 overflow-hidden rounded-lg border border-border p-4">{left}</div>
+            <div className="min-h-0 overflow-hidden rounded-lg border border-border p-0 flex flex-col">{middle}</div>
+            <div className="min-h-0 overflow-hidden rounded-lg border border-border">{right}</div>
+          </div>
+        ) : (
+          <div
+            className="flex-1 mt-6 overflow-hidden min-h-0 grid gap-4"
+            style={{ gridTemplateColumns: `minmax(0,1fr) minmax(0,1fr)` }}
+          >
+            <div className="min-h-0 overflow-hidden rounded-lg border border-border p-4">{left}</div>
+            <div className="min-h-0 overflow-hidden rounded-lg border border-border p-0 flex flex-col">{middle}</div>
+          </div>
+        )}
       </div>
     </div>
   )

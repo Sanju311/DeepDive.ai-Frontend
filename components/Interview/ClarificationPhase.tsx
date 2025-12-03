@@ -29,10 +29,8 @@ export function ClarificationPhase() {
   return (
     <InterviewShell
       left={<TranscriptPanel />}
-      middle={<NotesPanel />}
-      right={<InterviewSidebar />}
-      leftWidth="minmax(0,1fr)"
-      rightWidth="50%"
+      middle={<InterviewSidebar />}
+      right={undefined}
     />
   )
 }

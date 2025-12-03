@@ -19,7 +19,7 @@ const RadialCard: React.FC = () => {
   return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="flex items-center justify-center h-full relative" style={{ width: '220px', height: '220px' }}>
-          <svg width="60%" height="60%" viewBox="0 0 300 300">
+          <svg width="70%" height="70%" viewBox="0 0 300 300">
             {bars.map((height, index) => {
               const angle = (index / bars.length) * 360;
               const radians = (angle * Math.PI) / 180;
@@ -44,7 +44,6 @@ const RadialCard: React.FC = () => {
               );
             })}
           </svg>
-          <span className="absolute inset-0 m-auto w-[calc(100%-70%)] h-[calc(100%-70%)] bg-primary blur-[100px]"></span>
         </div>
       </div>
   );

@@ -28,9 +28,9 @@ export function TopPhaseNav() {
                   className={cn(
                     "px-3 py-2 rounded-full text-sm font-medium select-none",
                     isCompleted
-                      ? "bg-emerald-500 text-white"
+                      ? "bg-emerald-500 text-white shadow-[0_0_12px_3px_rgba(16,185,129,0.12)] transition-shadow"
                       : isCurrent
-                        ? "bg-purple-600 text-white ring-4 ring-purple-500/20"
+                        ? "bg-purple-600 text-white ring-4 ring-purple-500/20 shadow-[0_0_16px_4px_rgba(168,85,247,0.14)] transition-shadow"
                         : "bg-zinc-700 text-zinc-300"
                   )}
                 >

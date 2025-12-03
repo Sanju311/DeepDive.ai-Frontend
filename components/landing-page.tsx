@@ -47,22 +47,22 @@ export default function LandingPage() {
       <div className="relative z-10">
         {/* Top Bar */}
         <header className="absolute inset-x-0 top-0 z-10">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
+          <div className="flex w-full items-center justify-between py-4 px-4 md:px-6">
+            <div className="flex items-start gap-2 cursor-pointer" onClick={() => router.push('/')}>
               <Blocks
                 aria-hidden
                 ref={iconRef}
                 onMouseEnter={triggerSpin}
                 className="h-6 w-6"
               />
-              <span className="flex h-6 items-center text-sm font-semibold leading-none tracking-wide text-gray-200 mt-0.5">
+              <span className="flex h-6 items-center text-sm font-semibold leading-none tracking-wide text-gray-200">
                 Intervue.AI
               </span>
             </div>
             <div>
               <Link
                 href="/auth/login?returnTo=/home"
-                className="inline-flex items-center rounded-md text-white border-white border px-4 py-2 text-sm font-medium shadow-lg transition hover:scale-105"
+                className="inline-flex items-center rounded-md mt-2 text-white border-white border px-4 py-2 text-sm font-medium shadow-lg transition hover:scale-105"
               >
                 Sign in
               </Link>
@@ -139,6 +139,37 @@ export default function LandingPage() {
           </div>
         </section>
       </div>
+      {/* Footer - bottom right */}
+      <footer className="fixed bottom-4 right-4 z-20">
+        <div className="flex items-center gap-3 text-xs text-gray-400">
+          <a
+            href="https://portfolio-git-main-sanju311s-projects.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            Built by <span className="">Sanju S.</span>
+          </a>
+          <a
+            href="https://github.com/Sanju311"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="hover:text-white transition-colors"
+          >
+            <img src="/github-icon.png" alt="GitHub" className="h-5 w-5 opacity-80 hover:opacity-100" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/sanjusathya/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="hover:text-white transition-colors"
+          >
+            <img src="/linkedin-icon.png" alt="LinkedIn" className="h-4 w-4 opacity-80 hover:opacity-100" />
+          </a>
+        </div>
+      </footer>
     </main>
   )
 }

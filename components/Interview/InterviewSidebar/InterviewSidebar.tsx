@@ -6,7 +6,7 @@ import { ChevronDown, ChevronRight } from "lucide-react"
 import { useMemo, useState } from "react"
 
 export function InterviewSidebar() {
-  const { session, nextPhase, previousPhase, getCurrentPhaseNotes } = useInterview()
+  const { session, nextPhase, previousPhase, getCurrentPhaseNotes, setCurrentPhaseNotes } = useInterview()
 
   const currSession = session
   const currProblemDisplayData = currSession.problem_display_data
@@ -30,9 +30,9 @@ export function InterviewSidebar() {
   }, [currProblemDisplayData])
 
   return (
-    <aside className="h-full p-3 flex flex-col">
+    <aside className="h-full p-4 flex flex-col">
       {/* Problem Details */}
-      <div className="p-3 border-b border-gray-800">
+      <div className="pt-1 pb-3  px-3 border-b">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-bold text-lg">
             1. {currProblemDisplayData?.name}
@@ -114,23 +114,21 @@ export function InterviewSidebar() {
       {/* User Notes */}
       <div className="flex-1 p-3">
         <h3 className="font-semibold mb-2">Notes</h3>
-        <div className="w-full h-40 bg-gray-800 border border-gray-700 rounded p-2 text-sm overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-          {currSession.phase === "clarification" ? (
-            <p className="text-gray-500 italic">Your notes will appear here.</p>
-          ) : currSession.clarificationNotes ? (
-            <p className="text-gray-300 whitespace-pre-wrap">{currSession.clarificationNotes}</p>
-          ) : (
-            <p className="text-gray-500 italic">No notes saved yet</p>
-          )}
-        </div>
+        <textarea
+          aria-label="Interview notes"
+          className="w-full h-40 bg-gray-900 border border-gray-700 rounded p-2 text-sm overflow-y-auto resize-none dark-scroll text-gray-200 placeholder:text-gray-500"
+          placeholder="Write notes here..."
+          value={getCurrentPhaseNotes() || currSession.clarificationNotes || ""}
+          onChange={(e) => setCurrentPhaseNotes(e.target.value)}
+        />
       </div>
 
       {/* Phase Controls */}
-      <div className="p-3 border-t border-gray-800 flex justify-between">
+      <div className="pt-4 pb-1 px-3 border-t border-gray-800 flex justify-between items-center">
         <Button variant="secondary" className="bg-gray-700" onClick={previousPhase}>
           Back
         </Button>
-        <Button onClick={handleNext} className="bg-purple-600">
+        <Button onClick={handleNext} className="bg-purple-600 hover:bg-purple-700">
           Next
         </Button>
       </div>
