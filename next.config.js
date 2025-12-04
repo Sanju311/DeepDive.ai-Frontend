@@ -13,3 +13,5 @@ const nextConfig = {
     ];
   },
 };
+
+console.log("BUILD ROOT:", __dirname);
