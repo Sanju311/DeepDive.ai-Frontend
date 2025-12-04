@@ -204,7 +204,7 @@ export default function ProblemsPage() {
         {error && <div className="text-sm text-rose-400">{error}</div>}
 
         {!loading && !error && (
-          <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 flex-1 overflow-hidden items-start content-start">
+          <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 flex-1 overflow-visible items-start content-start">
             {pageItems.map((p) => (
               <Card
                 key={`${p.problem_number}-${p.name}`}

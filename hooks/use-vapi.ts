@@ -475,7 +475,7 @@ const useVapi = (options?: UseVapiOptions) => {
 
   const toggleCall = useCallback(async (assistantType?: "clarification" | "deep-dive", assistantOverrides?: Record<string, any>) => {
     try {
-      return;
+
       if (isSessionActiveRef.current) {
         console.log("stopping call");
         await vapiRef.current.stop();
