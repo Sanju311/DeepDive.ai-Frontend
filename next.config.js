@@ -1,17 +1,20 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
   experimental: {
-    turbo: false, 
+    serverActions: {
+      allowedOrigins: ["*"],   // safe reset
+    },
+    optimizePackageImports: false, // disables edge-based rebundling
+    typedRoutes: false,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/proxy/:path*',
-        destination: 'http://localhost:8000/:path*',
-      },
-    ];
-  },
+  webpack(config) {
+    config.resolve.symlinks = false;
+    config.resolve.extensionAlias = {
+      ".js": [".js", ".ts", ".tsx"],
+      ".mjs": [".mjs", ".js"],
+    };
+    return config;
+  }
 };
 
-console.log("BUILD ROOT:", __dirname);
+module.exports = nextConfig;
