@@ -40,7 +40,7 @@ export function Sidebar() {
       {/* Header */}
       <div className={cn('flex items-center justify-between p-6', isCollapsed ? 'px-4' : 'px-6')}>
         {!isCollapsed && expandedReady && (
-          <h2 className="text-lg font-bold text-purple-400 whitespace-nowrap">Interview AI</h2>
+          <h2 className="text-lg font-bold text-purple-400 whitespace-nowrap">DeepDive.ai</h2>
         )}
         <button
           onClick={toggleSidebar}

@@ -56,7 +56,7 @@ export default function LandingPage() {
                 className="h-6 w-6"
               />
               <span className="flex h-6 items-center text-sm font-semibold leading-none tracking-wide text-gray-200">
-                Intervue.AI
+                DeepDive.ai
               </span>
             </div>
             <div>
