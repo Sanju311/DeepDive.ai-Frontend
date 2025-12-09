@@ -5,6 +5,8 @@ import { useInterview } from "./InterviewProvider"
 import { Loader2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TopPhaseNav } from "./TopPhaseNav"
+import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 type FeedbackResponse = {
   success?: boolean
@@ -26,7 +28,7 @@ function scoreColor(score: number) {
   if (score <= 3) return "#fbbf24"      // yellow
   if (score <= 4) return "#84cc16"      // light green
   return "#22c55e"                      // bright green
-}
+} 
 
 function RadialGauge({ score, size = 96, strokeWidth = 10 }: { score: number; size?: number; strokeWidth?: number }) {
   const clamped = Math.max(0, Math.min(5, score))
@@ -87,9 +89,25 @@ function FeedbackContent() {
         if (res.ok) {
           const data: FeedbackResponse = await res.json()
           if (data?.success) { 
-            console.log("Feedback:", data?.feedback)
-            if ((data as any)?.category_scores) setDeepdiveFeedback((data as any).category_scores)
-            if ((data as any)?.communication) setCommunication((data as any).communication)
+            const fb = (data as any)?.feedback ?? {}
+            console.log("Feedback:", fb)
+            // Extract communication block if present under feedback
+            const comm = (fb as any)?.communication
+            if (comm) setCommunication(comm)
+            // Map feedback categories (excluding 'communication') into expected category_scores shape
+            const categories: Record<string, CategoryFeedback> = {}
+            Object.entries(fb as Record<string, any>).forEach(([key, value]) => {
+              if (key === "communication") return
+              if (value && typeof value === "object" && typeof (value as any).score === "number") {
+                categories[key] = {
+                  score: Number((value as any).score ?? 0),
+                  feedback: String((value as any).feedback ?? ""),
+                }
+              }
+            })
+            if (Object.keys(categories).length > 0) {
+              setDeepdiveFeedback(categories)
+            }
             setIsLoading(false)
             setMessage("Feedback is ready.")
             stopRef.current = true
@@ -100,7 +118,7 @@ function FeedbackContent() {
         // swallow and retry
       }
       setTimeout(poll, 2000)
-    }
+    } 
 
     poll()
     return () => {
@@ -115,7 +133,7 @@ function FeedbackContent() {
   const keys = Object.keys(cats).sort((a, b) => {
     const ia = rubricOrder.indexOf(String(a).toLowerCase())
     const ib = rubricOrder.indexOf(String(b).toLowerCase())
-    const sa = ia === -1 ? Number.MAX_SAFE_INTEGER : ia
+    const sa = ia === -1 ? Number.MAX_SAFE_INTEGER : ia 
     const sb = ib === -1 ? Number.MAX_SAFE_INTEGER : ib
     if (sa !== sb) return sa - sb
     return a.localeCompare(b)
@@ -133,8 +151,8 @@ function FeedbackContent() {
   }
 
   return (
-    <div className="w-full h-full overflow-auto p-4">
-      <div className="w-[96%] mx-auto space-y-5">
+    <div className="w-full px-4 pt-2 pb-0">
+      <div className="w-[96%] mx-auto space-y-4">
         {(() => {
           const totalCards = (communication ? 1 : 0) + keys.length
           const gaugeSize = totalCards >= 4 ? 160 : totalCards === 3 ? 180 : 200
@@ -155,9 +173,9 @@ function FeedbackContent() {
                 const cf = cats[key]
                 const title = key.charAt(0).toUpperCase() + key.slice(1)
                 return (
-                  <Card key={key} className="border-zinc-800 bg-zinc-950 h-full flex flex-col" style={{ minHeight: cardMinHeight }}>
+                  <Card key={key} className="border-border bg-gray-950 h-full flex flex-col" style={{ minHeight: cardMinHeight }}>
                     <CardHeader className="pt-4 pb-0 px-4">
-                      <CardTitle className="text-base md:text-lg text-white">{title}</CardTitle>
+                      <CardTitle className="text-base md:text-lg text-white">{title}</CardTitle> 
                     </CardHeader>
                     <CardContent className="px-4 pb-4 pt-3 flex-1 flex flex-col gap-4">
                       <div className="w-full flex justify-center py-1">
@@ -172,7 +190,7 @@ function FeedbackContent() {
               })}
               {/* Communication card */}
               {communication && (
-                <Card className="border-zinc-800 bg-zinc-950 h-full flex flex-col" style={{ minHeight: cardMinHeight }}>
+                <Card className="border-zinc-800 bg-gray-950 h-full flex flex-col" style={{ minHeight: cardMinHeight }}>
                   <CardHeader className="pt-4 pb-0 px-4">
                     <CardTitle className="text-base md:text-lg text-white">Communication</CardTitle>
                   </CardHeader>
@@ -190,7 +208,7 @@ function FeedbackContent() {
           )
         })()}
 
-        <Card className="border-zinc-800 bg-zinc-950">
+        <Card className="border-zinc-800 bg-gray-950">
 
           <CardContent className="px-6 pb-6 pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -228,6 +246,7 @@ function FeedbackContent() {
 
 export default function FeedbackPhase() {
   const { session } = useInterview()
+  const router = useRouter()
   const meta = { title: "Feedback", desc: "Wrap up and review key points." }
   return (
     <div className="flex h-screen bg-gray-950 text-white p-6">
@@ -241,9 +260,14 @@ export default function FeedbackPhase() {
             <TopPhaseNav />
           </div>
         </div>
-        <div className="flex-1 min-h-0 mt-6 overflow-auto">
-          <div className="max-w-6xl mx-auto">
+        <div className="flex-1 min-h-0 mt-4 overflow-auto">
+          <div className="max-w-6xl mx-auto pb-4">
             <FeedbackContent />
+            <div className="mt-6 w-full flex items-center justify-center">
+              <Button className="bg-purple-600 hover:bg-purple-700" onClick={() => router.push("/home")}>
+                Finish Interview
+              </Button>
+            </div>
           </div>
         </div>
       </div>
