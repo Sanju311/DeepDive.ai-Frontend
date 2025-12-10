@@ -101,7 +101,10 @@ export default function LandingPage() {
           <div className="mx-auto flex h-full w-full max-w-5xl flex-col justify-start px-6 pt-12 md:pt-20">
             <div className="mx-auto w-full">
               {/* Embla Carousel */}
-              <div className="overflow-hidden rounded-xl border border-white backdrop:shadow-xl" ref={emblaRef}>
+              <div
+                className="overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm border-2 border-white/10 shadow-2xl shadow-black/40"
+                ref={emblaRef}
+              >
                 <div className="flex">
                   {[0, 1, 2, 3, 4].map((n) => (
                     <div key={n} className="flex-[0_0_100%]">
@@ -118,7 +121,7 @@ export default function LandingPage() {
 
             {/* Info Cards */}
             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-8 md:grid-cols-4 max-h-48">
-              <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
+              <div className="rounded-xl p-6 bg-white/4 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/30 transition-transform duration-100 hover:scale-[1.02] hover:bg-white/6">
                 <h3 className="text-base font-semibold text-white">
                   1. Clarification
                 </h3>
@@ -126,7 +129,7 @@ export default function LandingPage() {
                 The agent presents the problem along with the opportunity to clarify your understanding, the constraints and solution scope.
                 </p>
               </div>
-              <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
+              <div className="rounded-xl p-6 bg-white/4 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/30 transition-transform duration-100 hover:scale-[1.02] hover:bg-white/6">
                 <h3 className="text-base font-semibold text-white">
                   2. Diagram Design
                 </h3>
@@ -134,7 +137,7 @@ export default function LandingPage() {
                 Design your custom architecture in an intuitive drag & drop canvas that understands components & validates connections. 
                 </p>
               </div>
-              <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
+              <div className="rounded-xl p-6 bg-white/4 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/30 transition-transform duration-100 hover:scale-[1.02] hover:bg-white/6">
                 <h3 className="text-base font-semibold text-white">
                   3. Deep Dive
                 </h3>
@@ -142,7 +145,7 @@ export default function LandingPage() {
                 Experience a fully simulated technical interview as the agent drills into your design & challenges your reasoning.
                 </p>
               </div>
-              <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
+              <div className="rounded-xl p-6 bg-white/4 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/30 transition-transform duration-100 hover:scale-[1.02] hover:bg-white/6">
                 <h3 className="text-base font-semibold text-white">
                   4. Feedback
                 </h3>
