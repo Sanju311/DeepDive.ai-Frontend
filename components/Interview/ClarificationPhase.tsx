@@ -6,6 +6,7 @@ import InterviewShell from "./InterviewShell"
 import TranscriptPanel from "./TranscriptPanel"
 import NotesPanel from "./NotesPanel"
 import { InterviewSidebar } from "./InterviewSidebar/InterviewSidebar"
+import { Loader2 } from "lucide-react"
 
 export function ClarificationPhase() {
   const { startInterview, session, toggleCall, isSessionActive, navDirection } = useInterview()
@@ -25,6 +26,17 @@ export function ClarificationPhase() {
       toggleCall("clarification", overrides)
     }
   }, [isSessionActive, toggleCall, navDirection, session?.clarificationOverrides])
+
+  if (!isSessionActive) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-950 text-white">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+          <div className="text-sm text-gray-300">Connecting to interviewer…</div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <InterviewShell

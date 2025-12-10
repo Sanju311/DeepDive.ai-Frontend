@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@auth0/nextjs-auth0/client'
+import { Loader2 } from 'lucide-react'
 
 type Problem = {
   problem_number: number
@@ -200,7 +201,14 @@ export default function ProblemsPage() {
           </div>
         </div>
 
-        {loading && <div className="text-sm text-muted-foreground">Loading problems…</div>}
+        {loading && (
+          <div className="flex-1 flex items-center justify-center py-12">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+              <span className="text-sm text-muted-foreground">Loading problems…</span>
+            </div>
+          </div>
+        )}
         {error && <div className="text-sm text-rose-400">{error}</div>}
 
         {!loading && !error && (

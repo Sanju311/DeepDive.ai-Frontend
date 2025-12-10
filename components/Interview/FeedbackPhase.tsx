@@ -141,12 +141,12 @@ function FeedbackContent() {
 
   if (isLoading) {
     return (
-      <div className="w-full h-full flex items-center justify-center p-8">
-        <div className="flex items-center gap-3 text-gray-300">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <span className="text-sm">{message}</span>
+      <div className="w-full flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
+          <div className="text-sm text-gray-300">{message}</div>
         </div>
-      </div> 
+      </div>
     )
   }
 
