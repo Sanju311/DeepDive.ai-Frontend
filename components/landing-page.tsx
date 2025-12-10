@@ -3,10 +3,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useCallback } from "react";
 import {Blocks} from "lucide-react"
+import useEmblaCarousel from "embla-carousel-react"
+import Autoplay from "embla-carousel-autoplay"
 
 export default function LandingPage() {
   const iconRef = useRef<SVGSVGElement | null>(null);
   const router = useRouter();
+  const autoplay = useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: false })
+  )
+  const [emblaRef] = useEmblaCarousel({ loop: true }, [autoplay.current])
   const triggerSpin = useCallback(() => {
     const el = iconRef.current;
     if (!el) return;
@@ -80,8 +86,9 @@ export default function LandingPage() {
           </p>
           <div className="mt-8">
             <a
-              href="#demo"
-              onClick={scrollToDemo}
+              href="https://www.loom.com/share/57322cc3263f456da590222e339e8b86"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center rounded-md text-white border-white border px-6 py-3 text-sm font-medium shadow-lg transition hover:scale-105"
             >
               View Demo
@@ -90,25 +97,33 @@ export default function LandingPage() {
         </section>
 
       {/* Demo Section */}
-        <section id="demo" className="relative w-full h-screen  border-gray-900 bg-transparent">
-          <div className="mx-auto flex h-full w-full max-w-6xl flex-col justify-center px-6">
+        <section id="demo" className="relative w-full h-screen border-gray-900 bg-transparent">
+          <div className="mx-auto flex h-full w-full max-w-5xl flex-col justify-start px-6 pt-12 md:pt-20">
             <div className="mx-auto w-full">
-              {/* Using a basic img to avoid external image config for now */}
-              <img
-                src="https://via.placeholder.com/1200x600"
-                alt="Demo preview"
-                className="w-full rounded-xl border border-gray-800 shadow-xl"
-              />
+              {/* Embla Carousel */}
+              <div className="overflow-hidden rounded-xl border border-white backdrop:shadow-xl" ref={emblaRef}>
+                <div className="flex">
+                  {[0, 1, 2, 3, 4].map((n) => (
+                    <div key={n} className="flex-[0_0_100%]">
+                      <img
+                        src={`/carousel_pics/${n}.png`}
+                        alt={`Demo preview ${n}`}
+                        className="block w-full h-auto"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Info Cards */}
-            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-12 md:grid-cols-4">
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-8 md:grid-cols-4 max-h-48">
               <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
                 <h3 className="text-base font-semibold text-white">
                   1. Clarification
                 </h3>
                 <p className="mt-2 text-sm text-gray-300">
-                Kick off with a fast, interactive clarification round where the agent tests your ability to extract requirements, uncover constraints, and shape the problem like a real system designer.
+                The agent presents the problem along with the opportunity to clarify your understanding, the constraints and solution scope.
                 </p>
               </div>
               <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
@@ -116,7 +131,7 @@ export default function LandingPage() {
                   2. Diagram Design
                 </h3>
                 <p className="mt-2 text-sm text-gray-300">
-                Build your architecture in an intuitive, real-time design canvas that understands every component, validates connections, and feeds your diagram directly into the evaluation engine.
+                Design your custom architecture in an intuitive drag & drop canvas that understands components & validates connections. 
                 </p>
               </div>
               <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
@@ -124,7 +139,7 @@ export default function LandingPage() {
                   3. Deep Dive
                 </h3>
                 <p className="mt-2 text-sm text-gray-300">
-                Experience a fully simulated technical interview as the agent drills into your design, challenges your reasoning, and mirrors the depth and intensity of a top-tier engineering interviewer.
+                Experience a fully simulated technical interview as the agent drills into your design & challenges your reasoning.
                 </p>
               </div>
               <div className="rounded-xl border border-white p-6 shadow-md transition-transform duration-100 hover:scale-[1.02]">
@@ -132,7 +147,7 @@ export default function LandingPage() {
                   4. Feedback
                 </h3>
                 <p className="mt-2 text-sm text-gray-300">
-                As you interview, multiple evaluators grade your decisions asynchronously — delivering a detailed, multi-dimension performance report within seconds of finishing.
+                Receive a detailed performance evaluation across key rubric categories along with actionable feedback.
                 </p>
               </div>
             </div>

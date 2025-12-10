@@ -165,8 +165,8 @@ export default function ProblemsPage() {
 
   return (
     <div className="p-8 h-screen overflow-hidden bg-background text-foreground">
-      <div ref={containerRef} className="max-w-6xl mx-auto h-full flex flex-col">
-        <div ref={topRef} className="mb-6 space-y-3">
+      <div ref={containerRef} className="w-full px-20 h-full flex flex-col">
+        <div ref={topRef} className="mt-6 mb-6 space-y-3">
           <h1 className="text-5xl ">Welcome back{user?.name ? `, ${user.name}` : ""}</h1>
           <p className="text-muted-foreground">Choose a problem below to mock interview. Use search and filters to narrow down.</p>
         </div>
@@ -212,7 +212,7 @@ export default function ProblemsPage() {
         {error && <div className="text-sm text-rose-400">{error}</div>}
 
         {!loading && !error && (
-          <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 flex-1 overflow-visible items-start content-start">
+          <div ref={gridRef} className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 flex-1 overflow-visible items-start content-start">
             {pageItems.map((p) => (
               <Card
                 key={`${p.problem_number}-${p.name}`}
