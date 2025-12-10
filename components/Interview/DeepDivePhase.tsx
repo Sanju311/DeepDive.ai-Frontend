@@ -12,6 +12,7 @@ export function DeepDivePhase() {
   
   const { session, toggleCall, isSessionActive, navDirection, configureDeepDive } = useInterview()
   const startedRef = useRef(false)
+  const hasConnectedRef = useRef(false)
   useEffect(() => {
     // Auto-start once when overrides are available and not navigating backward
     if (navDirection === "backward") return
@@ -28,7 +29,13 @@ export function DeepDivePhase() {
 
   const middle = <DiagramCanvasReactFlowWrapper dragging={null} onEndDrag={() => {}} readOnly />
 
-  if (!isSessionActive) {
+  // Mark that we've connected at least once
+  if (isSessionActive && !hasConnectedRef.current) {
+    hasConnectedRef.current = true
+  }
+
+  // Show loader only before first connection
+  if (!isSessionActive && !hasConnectedRef.current) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-950 text-white">
         <div className="flex flex-col items-center gap-3">

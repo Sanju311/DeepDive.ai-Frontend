@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react"
 export function ClarificationPhase() {
   const { startInterview, session, toggleCall, isSessionActive, navDirection } = useInterview()
   const startedRef = useRef(false)
+  const hasConnectedRef = useRef(false)
 
   useEffect(() => {
     startInterview()
@@ -27,7 +28,13 @@ export function ClarificationPhase() {
     }
   }, [isSessionActive, toggleCall, navDirection, session?.clarificationOverrides])
 
-  if (!isSessionActive) {
+  // Mark that we've connected at least once
+  if (isSessionActive && !hasConnectedRef.current) {
+    hasConnectedRef.current = true
+  }
+
+  // Show loader only before first connection
+  if (!isSessionActive && !hasConnectedRef.current) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-950 text-white">
         <div className="flex flex-col items-center gap-3">
