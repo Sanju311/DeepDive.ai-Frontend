@@ -263,11 +263,13 @@ export default function FeedbackPhase() {
         <div className="flex-1 min-h-0 mt-4 overflow-auto">
           <div className="max-w-6xl mx-auto pb-4">
             <FeedbackContent />
-            <div className="mt-6 w-full flex items-center justify-center">
-              <Button className="bg-purple-600 hover:bg-purple-700" onClick={() => router.push("/home")}>
-                Finish Interview
-              </Button>
-            </div>
+            {session.deepdiveFeedback && (
+              <div className="mt-6 w-full flex items-center justify-center">
+                <Button className="bg-purple-600 hover:bg-purple-700" onClick={() => router.push("/home")}>
+                  Finish Interview
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
