@@ -84,7 +84,7 @@ export default function LandingPage() {
           <p className="mt-5 max-w-xl text-base text-gray-300 sm:text-lg">
             Interview with context-aware voice agents, design interactive solutions, receive actionable feedback.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex items-center gap-3">
             <a
               href="https://www.loom.com/share/57322cc3263f456da590222e339e8b86"
               target="_blank"
@@ -93,6 +93,19 @@ export default function LandingPage() {
             >
               View Demo
             </a>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                const target = document.getElementById("demo")
+                if (target) target.scrollIntoView({ behavior: "smooth", block: "start" })
+              }}
+              className="inline-flex items-center rounded-md text-white border-white border px-6 py-3 text-sm font-medium shadow-lg transition hover:scale-105"
+            >
+              See Preview
+            </button>
+
+            
           </div>
         </section>
 
