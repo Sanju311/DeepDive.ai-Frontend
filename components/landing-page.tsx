@@ -102,7 +102,7 @@ export default function LandingPage() {
               }}
               className="inline-flex items-center rounded-md text-white border-white border px-6 py-3 text-sm font-medium shadow-lg transition hover:scale-105"
             >
-              See Preview
+              Learn More
             </button>
 
             
