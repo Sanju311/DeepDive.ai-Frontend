@@ -97,8 +97,8 @@ export default function LandingPage() {
         </section>
 
       {/* Demo Section */}
-        <section id="demo" className="relative w-full h-screen border-gray-900 bg-transparent">
-          <div className="mx-auto flex h-full w-full max-w-5xl flex-col justify-start px-6 pt-12 md:pt-20">
+        <section id="demo" className="relative w-full min-h-screen border-gray-900 bg-transparent">
+          <div className="mx-auto  xs:max-w-sm md:max-w-2xl lg:max-w-5xl flex flex-col justify-center gap-6 md:gap-8 lg:gap-10 px-6 py-8 md:py-12 lg:py-16">
             <div className="mx-auto w-full">
               {/* Embla Carousel */}
               <div
@@ -111,7 +111,7 @@ export default function LandingPage() {
                       <img
                         src={`/carousel_pics/${n}.png`}
                         alt={`Demo preview ${n}`}
-                        className="block w-full h-auto"
+                        className="block w-full h-auto max-h-[40vh] sm:max-h-[50vh] md:max-h-[55vh] lg:max-h-[60vh] xl:max-h-[65vh] 2xl:max-h-[70vh] object-contain"
                       />
                     </div>
                   ))}
@@ -120,7 +120,7 @@ export default function LandingPage() {
             </div>
 
             {/* Info Cards */}
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-8 md:grid-cols-4 max-h-48">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
               <div className="rounded-xl p-6 bg-white/4 backdrop-blur-sm border border-white/10 shadow-lg shadow-black/30 transition-transform duration-100 hover:scale-[1.02] hover:bg-white/6">
                 <h3 className="text-base font-semibold text-white">
                   1. Clarification
